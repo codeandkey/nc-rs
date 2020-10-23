@@ -97,10 +97,22 @@ mod tests {
 
     #[test]
     fn square_from_uci_works() {
-        assert_eq!(Square::from_uci(&"e1".to_string()).unwrap(), Square::at(0, 4));
-        assert_eq!(Square::from_uci(&"b4".to_string()).unwrap(), Square::at(3, 1));
-        assert_eq!(Square::from_uci(&"g2".to_string()).unwrap(), Square::at(1, 6));
-        assert_eq!(Square::from_uci(&"a8".to_string()).unwrap(), Square::at(7, 0));
+        assert_eq!(
+            Square::from_uci(&"e1".to_string()).unwrap(),
+            Square::at(0, 4)
+        );
+        assert_eq!(
+            Square::from_uci(&"b4".to_string()).unwrap(),
+            Square::at(3, 1)
+        );
+        assert_eq!(
+            Square::from_uci(&"g2".to_string()).unwrap(),
+            Square::at(1, 6)
+        );
+        assert_eq!(
+            Square::from_uci(&"a8".to_string()).unwrap(),
+            Square::at(7, 0)
+        );
 
         assert_eq!(Square::from_uci(&"-".to_string()), None);
         assert_eq!(Square::from_uci(&"I'MTOOLONG!".to_string()), None);

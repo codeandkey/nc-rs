@@ -1,7 +1,5 @@
+mod gmove;
 mod piece;
 mod square;
-mod gmove;
 
-fn main() {
-
-}
+fn main() {}

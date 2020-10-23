@@ -100,24 +100,52 @@ mod tests {
 
     #[test]
     fn move_to_uci_works() {
-        assert_eq!(Move::new(Square::at(0, 0), Square::at(4, 5), None).to_uci(), "a1f5");
+        assert_eq!(
+            Move::new(Square::at(0, 0), Square::at(4, 5), None).to_uci(),
+            "a1f5"
+        );
 
-        assert_eq!(Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::QUEEN)).to_uci(), "b7b8q");
-        assert_eq!(Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::BISHOP)).to_uci(), "b7b8b");
-        assert_eq!(Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::KNIGHT)).to_uci(), "b7b8n");
-        assert_eq!(Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::ROOK)).to_uci(), "b7b8r");
+        assert_eq!(
+            Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::QUEEN)).to_uci(),
+            "b7b8q"
+        );
+        assert_eq!(
+            Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::BISHOP)).to_uci(),
+            "b7b8b"
+        );
+        assert_eq!(
+            Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::KNIGHT)).to_uci(),
+            "b7b8n"
+        );
+        assert_eq!(
+            Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::ROOK)).to_uci(),
+            "b7b8r"
+        );
     }
 
     #[test]
     fn move_to_uci_withnull_works() {
         assert_eq!(Move::to_uci_withnull(&None), "0000");
-        assert_eq!(Move::to_uci_withnull(&Some(Move::new(Square::at(6, 1), Square::at(7, 1), Some(Type::KNIGHT)))), "b7b8n");
+        assert_eq!(
+            Move::to_uci_withnull(&Some(Move::new(
+                Square::at(6, 1),
+                Square::at(7, 1),
+                Some(Type::KNIGHT)
+            ))),
+            "b7b8n"
+        );
     }
 
     #[test]
     fn move_from_uci_works() {
         assert_eq!(Move::from_uci(&"0000".to_string()), None);
-        assert_eq!(Move::from_uci(&"a1e4".to_string()).unwrap(), Move::new(Square::at(0, 0), Square::at(3, 4), None));
-        assert_eq!(Move::from_uci(&"c7c8q".to_string()).unwrap(), Move::new(Square::at(6, 2), Square::at(7, 2), Some(Type::QUEEN)));
+        assert_eq!(
+            Move::from_uci(&"a1e4".to_string()).unwrap(),
+            Move::new(Square::at(0, 0), Square::at(3, 4), None)
+        );
+        assert_eq!(
+            Move::from_uci(&"c7c8q".to_string()).unwrap(),
+            Move::new(Square::at(6, 2), Square::at(7, 2), Some(Type::QUEEN))
+        );
     }
 }

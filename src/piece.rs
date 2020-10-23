@@ -67,10 +67,7 @@ pub struct Piece {
 
 impl Piece {
     pub fn from(t: Type, c: Color) -> Self {
-        Piece {
-            ptype: t,
-            color: c,
-        }
+        Piece { ptype: t, color: c }
     }
 
     pub fn to_fen(&self) -> char {
@@ -91,7 +88,7 @@ impl Piece {
         } else {
             Color::BLACK
         };
-        
+
         if ptype.is_none() {
             return None;
         }
@@ -152,10 +149,22 @@ mod tests {
 
     #[test]
     fn piece_from_fen_works() {
-        assert_eq!(Piece::from(Type::PAWN, Color::BLACK), Piece::from_fen('p').unwrap());
-        assert_eq!(Piece::from(Type::KNIGHT, Color::WHITE), Piece::from_fen('N').unwrap());
-        assert_eq!(Piece::from(Type::QUEEN, Color::BLACK), Piece::from_fen('q').unwrap());
-        assert_eq!(Piece::from(Type::KING, Color::WHITE), Piece::from_fen('K').unwrap());
+        assert_eq!(
+            Piece::from(Type::PAWN, Color::BLACK),
+            Piece::from_fen('p').unwrap()
+        );
+        assert_eq!(
+            Piece::from(Type::KNIGHT, Color::WHITE),
+            Piece::from_fen('N').unwrap()
+        );
+        assert_eq!(
+            Piece::from(Type::QUEEN, Color::BLACK),
+            Piece::from_fen('q').unwrap()
+        );
+        assert_eq!(
+            Piece::from(Type::KING, Color::WHITE),
+            Piece::from_fen('K').unwrap()
+        );
 
         assert_eq!(Piece::from_fen('a'), None);
     }
