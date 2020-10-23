@@ -108,6 +108,19 @@ mod tests {
     use super::*;
 
     #[test]
+    fn color_to_fen_works() {
+        assert_eq!(Color::WHITE.to_fen(), 'w');
+        assert_eq!(Color::BLACK.to_fen(), 'b');
+    }
+
+    #[test]
+    fn color_from_fen_works() {
+        assert_eq!(Color::from_fen('w').unwrap(), Color::WHITE);
+        assert_eq!(Color::from_fen('b').unwrap(), Color::BLACK);
+        assert_eq!(Color::from_fen('a'), None);
+    }
+
+    #[test]
     fn type_to_fen_works() {
         assert_eq!(Type::PAWN.to_fen(), 'p');
         assert_eq!(Type::BISHOP.to_fen(), 'b');
