@@ -108,6 +108,28 @@ mod tests {
     use super::*;
 
     #[test]
+    fn type_to_fen_works() {
+        assert_eq!(Type::PAWN.to_fen(), 'p');
+        assert_eq!(Type::BISHOP.to_fen(), 'b');
+        assert_eq!(Type::KNIGHT.to_fen(), 'n');
+        assert_eq!(Type::ROOK.to_fen(), 'r');
+        assert_eq!(Type::QUEEN.to_fen(), 'q');
+        assert_eq!(Type::KING.to_fen(), 'k');
+    }
+
+    #[test]
+    fn type_from_fen_works() {
+        assert_eq!(Type::from_fen('p').unwrap(), Type::PAWN);
+        assert_eq!(Type::from_fen('b').unwrap(), Type::BISHOP);
+        assert_eq!(Type::from_fen('n').unwrap(), Type::KNIGHT);
+        assert_eq!(Type::from_fen('r').unwrap(), Type::ROOK);
+        assert_eq!(Type::from_fen('q').unwrap(), Type::QUEEN);
+        assert_eq!(Type::from_fen('k').unwrap(), Type::KING);
+
+        assert_eq!(Type::from_fen('a'), None);
+    }
+
+    #[test]
     fn piece_to_fen_works() {
         assert_eq!(Piece::from(Type::PAWN, Color::WHITE).to_fen(), 'P');
         assert_eq!(Piece::from(Type::KNIGHT, Color::BLACK).to_fen(), 'n');
@@ -121,5 +143,7 @@ mod tests {
         assert_eq!(Piece::from(Type::KNIGHT, Color::WHITE), Piece::from_fen('N').unwrap());
         assert_eq!(Piece::from(Type::QUEEN, Color::BLACK), Piece::from_fen('q').unwrap());
         assert_eq!(Piece::from(Type::KING, Color::WHITE), Piece::from_fen('K').unwrap());
+
+        assert_eq!(Piece::from_fen('a'), None);
     }
 }
