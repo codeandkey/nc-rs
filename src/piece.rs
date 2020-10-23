@@ -1,6 +1,6 @@
 /* Piece types */
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Type {
     PAWN = 0,
     BISHOP = 1,
@@ -36,7 +36,7 @@ impl Type {
 }
 
 /* Piece colors */
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub enum Color {
     WHITE = 0,
     BLACK = 1,
@@ -59,7 +59,7 @@ impl Color {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Piece {
     ptype: Type,
     color: Color,
