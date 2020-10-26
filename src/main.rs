@@ -1,10 +1,13 @@
 mod attacks;
+mod board;
 mod bitboard;
 mod gmove;
 mod piece;
 mod square;
+mod zobrist;
 
 extern crate pretty_env_logger;
+extern crate rand;
 
 #[macro_use] extern crate arr_macro;
 #[macro_use] extern crate lazy_static;
