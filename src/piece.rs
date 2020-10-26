@@ -102,6 +102,14 @@ impl Piece {
     pub fn index(&self) -> usize {
         self.color as usize * 6 + self.ptype as usize
     }
+
+    pub fn get_color(&self) -> Color {
+        self.color.clone()
+    }
+
+    pub fn get_type(&self) -> Type {
+        self.ptype.clone()
+    }
 }
 
 #[cfg(test)]
