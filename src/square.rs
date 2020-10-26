@@ -1,6 +1,17 @@
+pub enum Direction {
+    EAST = 1,
+    WEST = -1,
+    NORTH = 8,
+    SOUTH = -8,
+    NORTHWEST = 7,
+    NORTHEAST = 9,
+    SOUTHWEST = -9,
+    SOUTHEAST = -7,
+}
+
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Square {
-    ind: u8,
+    ind: usize,
     r: u8,
     f: u8,
 }
@@ -11,7 +22,7 @@ impl Square {
         assert!(file < 8);
 
         Square {
-            ind: rank * 8 + file,
+            ind: (rank * 8 + file) as usize,
             r: rank,
             f: file,
         }
@@ -41,7 +52,7 @@ impl Square {
         Some(Square {
             r: rank as u8,
             f: file as u8,
-            ind: rank as u8 * 8 + file as u8,
+            ind: (rank * 8 + file) as usize,
         })
     }
 
@@ -64,7 +75,7 @@ impl Square {
         self.f
     }
 
-    pub fn index(&self) -> u8 {
+    pub fn index(&self) -> usize {
         self.ind
     }
 }
