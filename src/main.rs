@@ -32,19 +32,4 @@ fn main() {
         "{}",
         bitboard::to_pretty(attacks::queen(Square::at(0, 0), 128237u64))
     );
-
-    let mut b = board::Board::new();
-    b.place(Square::at(0, 0), piece::Piece::from_fen('Q').unwrap());
-    b.place(Square::at(0, 7), piece::Piece::from_fen('Q').unwrap());
-    b.place(Square::at(3, 3), piece::Piece::from_fen('Q').unwrap());
-
-    let am = b.get_ad()[piece::Color::WHITE as usize];
-
-    for r in (0..8).rev() {
-        for f in 0..8 {
-            print!("{} ", am[r * 8 + f]);
-        }
-
-        print!("\n");
-    }
 }

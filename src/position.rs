@@ -59,7 +59,7 @@ impl Position {
                 } else {
                     /* Place piece */
                     match Piece::from_fen(c) {
-                        Some(p) => b.place(Square::at(r as usize, f as usize), p),
+                        Some(p) => b.place(Square::at((7 - r) as usize, f as usize), p),
                         None => {
                             error!("Invalid piece character '{}' in FEN", c);
                             return None;
@@ -137,7 +137,57 @@ impl Position {
         })
     }
 
-    pub fn to_fen() -> String {
-        String::new()
+    pub fn to_fen(&self) -> String {
+        let mut output: String = self.b.to_fen_string();
+
+        /* Add color to move */
+        output.push_str(&format!(" {} ", self.ctm.to_fen()));
+
+        /* Add castling */
+        let top = self.ply.last().unwrap();
+
+        if top.castling[Color::WHITE as usize][Castling::KINGSIDE as usize] {
+            output.push('K');
+        }
+
+        if top.castling[Color::WHITE as usize][Castling::QUEENSIDE as usize] {
+            output.push('Q');
+        }
+
+        if top.castling[Color::BLACK as usize][Castling::KINGSIDE as usize] {
+            output.push('k');
+        }
+
+        if top.castling[Color::BLACK as usize][Castling::QUEENSIDE as usize] {
+            output.push('q');
+        }
+
+        output.push(' ');
+
+        /* Add ep target */
+        output.push_str(&Square::to_str_withnull(&top.ep_target));
+
+        /* Add halfmove clock */
+        output.push_str(&format!(" {}", top.hm_clock));
+
+        /* Add move number */
+        output.push_str(&format!(" {}", top.fm_number));
+
+        output
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn position_parse_fen_works() {
+        Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap();
+    }
+
+    #[test]
+    fn position_write_fen_works() {
+        assert_eq!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap().to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
 }
