@@ -758,9 +758,3 @@ pub fn queen(s: Square, occ: u64) -> u64 {
 pub fn king(s: Square) -> u64 {
     tables::KINGS[s.index()]
 }
-
-const fn get_i32() -> i32 {
-    return 0;
-}
-
-static t: i32 = get_i32();
