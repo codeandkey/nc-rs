@@ -98,6 +98,10 @@ impl Piece {
             color: color,
         })
     }
+
+    pub fn index(&self) -> usize {
+        self.color as usize * 6 + self.ptype as usize
+    }
 }
 
 #[cfg(test)]
