@@ -643,7 +643,7 @@ pub fn generate_bishop_tables() -> [Vec<u64>; 64] {
             assert!(output[sq][mindex] == 0u64);
 
             /* Northeast */
-            for d in 0..8 {
+            for d in 1..8 {
                 if src_r + d > 7 || src_f + d > 7 {
                     break;
                 }
@@ -657,7 +657,7 @@ pub fn generate_bishop_tables() -> [Vec<u64>; 64] {
             }
 
             /* Northwest */
-            for d in 0..8 {
+            for d in 1..8 {
                 if src_r + d > 7 || src_f - d < 0 {
                     break;
                 }
@@ -671,7 +671,7 @@ pub fn generate_bishop_tables() -> [Vec<u64>; 64] {
             }
 
             /* Southeast */
-            for d in 0..8 {
+            for d in 1..8 {
                 if src_r - d < 0 || src_f + d > 7 {
                     break;
                 }
@@ -685,7 +685,7 @@ pub fn generate_bishop_tables() -> [Vec<u64>; 64] {
             }
 
             /* Southwest */
-            for d in 0..8 {
+            for d in 1..8 {
                 if src_r - d < 0 || src_f - d < 0 {
                     break;
                 }
