@@ -141,6 +141,38 @@ impl Board {
     pub fn get_ad(&self) -> [[u64; 64]; 2] {
         self.ad
     }
+
+    pub fn to_fen_string(&self) -> String {
+        let mut output: String = String::new();
+
+        for r in (0..8).rev() {
+            let mut empty = 0;
+
+            for f in 0..8 {
+                match self.state[r * 8 + f] {
+                    Some(p) => {
+                        if empty > 0 {
+                            output.push_str(&empty.to_string());
+                            empty = 0;
+                        }
+
+                        output.push(p.to_fen());
+                    },
+                    None => empty += 1,
+                }
+            }
+
+            if empty > 0 {
+                output.push_str(&empty.to_string());
+            }
+
+            if r > 0 {
+                output.push('/');
+            }
+        }
+
+        output
+    }
 }
 
 #[cfg(test)]
@@ -197,5 +229,12 @@ mod tests {
         let mut b: Board = Board::new();
 
         b.remove(Square::at(0, 0));
+    }
+
+    #[test]
+    fn board_to_fen_string_works() {
+        let b: Board = Board::new();
+
+        assert_eq!(b.to_fen_string(), "8/8/8/8/8/8/8/8");
     }
 }
