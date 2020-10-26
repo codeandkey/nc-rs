@@ -12,17 +12,17 @@ pub enum Direction {
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Square {
     ind: usize,
-    r: u8,
-    f: u8,
+    r: usize,
+    f: usize,
 }
 
 impl Square {
-    pub fn at(rank: u8, file: u8) -> Square {
+    pub fn at(rank: usize, file: usize) -> Square {
         assert!(rank < 8);
         assert!(file < 8);
 
         Square {
-            ind: (rank * 8 + file) as usize,
+            ind: rank * 8 + file,
             r: rank,
             f: file,
         }
@@ -31,8 +31,8 @@ impl Square {
     pub fn to_str(&self) -> String {
         let mut out = String::new();
 
-        out.push((('a' as u8) + self.f) as char);
-        out.push((('1' as u8) + self.r) as char);
+        out.push((('a' as u8) + self.f as u8) as char);
+        out.push((('1' as u8) + self.r as u8) as char);
 
         out
     }
@@ -50,9 +50,21 @@ impl Square {
         }
 
         Some(Square {
-            r: rank as u8,
-            f: file as u8,
+            r: rank as usize,
+            f: file as usize,
             ind: (rank * 8 + file) as usize,
+        })
+    }
+
+    pub fn from_index(inp: usize) -> Option<Square> {
+        if inp > 64 {
+            return None;
+        }
+
+        Some(Square {
+            r: inp / 8,
+            f: inp % 8,
+            ind: inp,
         })
     }
 
@@ -67,11 +79,11 @@ impl Square {
         (1 as u64) << self.ind
     }
 
-    pub fn rank(&self) -> u8 {
+    pub fn rank(&self) -> usize {
         self.r
     }
 
-    pub fn file(&self) -> u8 {
+    pub fn file(&self) -> usize {
         self.f
     }
 
