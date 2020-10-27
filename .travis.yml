@@ -1,9 +1,38 @@
 language: rust
+
+sudo: required
+
 rust:
   - stable
   - beta
   - nightly
+
 jobs:
   allow_failures:
     - rust: nightly
   fast_finish: true
+
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
+      - cmake
+    sources:
+      - kalakris-cmake
+
+before_script:
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install cargo-update || echo "cargo-update already installed"
+  - cargo install cargo-travis || echo "cargo-travis already installed"
+  - cargo install-update -a
+
+script:
+  - |
+      cargo build &&
+      cargo test
+
+after_success:
+  - cargo coveralls
