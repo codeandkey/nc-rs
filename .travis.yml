@@ -12,18 +12,17 @@ jobs:
     - rust: nightly
   fast_finish: true
 
+before_script: |
+  if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then
+    cargo install cargo-tarpaulin
+  fi
+
 script:
+  - cargo clean
   - cargo build
   - cargo test
 
-after_success:
-  - export CARGO_INCREMENTAL=0
-  - export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-  - export RUSTDOCFLAGS="-Cpanic=abort"
-  - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
-  - cargo build --verbose $CARGO_OPTIONS
-  - cargo test --verbose $CARGO_OPTIONS
-  - |
-    zip -0 ccov.zip `find . \( -name "nc_rs*.gc*" \) -print`;
-    ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
-    bash <(curl -s https://codecov.io/bash) -f lcov.info;
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then
+    cargo tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID
+  fi
