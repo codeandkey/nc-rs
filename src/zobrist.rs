@@ -27,3 +27,32 @@ lazy_static! {
     pub static ref CASTLE: [[u64; 2]; 2] = gen_castle_keys();
     pub static ref PIECE: [[u64; 12]; 64] = gen_piece_keys();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zobrist_keys_are_unique() {
+        let mut keys: Vec<u64> = Vec::new();
+
+        keys.push(*BLACK_TO_MOVE);
+        keys.append(&mut Vec::from(*EN_PASSANT));
+
+        for i in 0..2 {
+            keys.append(&mut Vec::from(CASTLE[i]));
+        }
+
+        for i in 0..12 {
+            keys.append(&mut Vec::from(PIECE[i]));
+        }
+
+        /* Test for uniqueness */
+        keys.sort();
+
+        let sz = keys.len();
+        keys.dedup();
+
+        assert!(sz == keys.len());
+    }
+}
