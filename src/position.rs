@@ -39,6 +39,7 @@ impl Position {
 
         if ranks.len() != 8 {
             error!("Invalid number of FEN ranks: expected 8, read {}", ranks.len());
+            return None;
         }
 
         /* Parse individual ranks */
@@ -189,5 +190,30 @@ mod tests {
     #[test]
     fn position_write_fen_works() {
         assert_eq!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap().to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    }
+
+    #[test]
+    fn position_invalid_fen_works() {
+        /* too many parts */
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 100".to_string()).is_none());
+
+        /* bad rank count */
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+
+        /* bad rank content */
+        assert!(Position::new("rnbqkbnrQ/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+
+        /* bad piece chars */
+        assert!(Position::new("rnbqkbnrv/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+
+        /* invalid color */
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR k KQkq - 0 1".to_string()).is_none());
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR sdfkjns KQkq - 0 1 100".to_string()).is_none());
+
+        /* bad hm clock */
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - abc 1".to_string()).is_none());
+
+        /* bad fm number */
+        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 abc".to_string()).is_none());
     }
 }
