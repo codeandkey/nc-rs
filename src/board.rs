@@ -31,8 +31,10 @@ impl Board {
         /* Find pieces that require an A/D recalculation */
 
         let mut umask: u64 = 0u64;
-        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::BISHOP as usize]) & attacks::bishop(s, self.occ);
-        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::ROOK as usize]) & attacks::rook(s, self.occ);
+        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::BISHOP as usize])
+            & attacks::bishop(s, self.occ);
+        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::ROOK as usize])
+            & attacks::rook(s, self.occ);
 
         /* Remove attacks from required updates */
         bitboard::for_each(umask, |ts| {
@@ -63,8 +65,10 @@ impl Board {
         /* Find pieces that require an A/D recalculation */
 
         let mut umask: u64 = 0u64;
-        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::BISHOP as usize]) & attacks::bishop(s, self.occ);
-        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::ROOK as usize]) & attacks::rook(s, self.occ);
+        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::BISHOP as usize])
+            & attacks::bishop(s, self.occ);
+        umask |= (self.piece[Type::QUEEN as usize] | self.piece[Type::ROOK as usize])
+            & attacks::rook(s, self.occ);
 
         /* Remove attacks from required updates */
         bitboard::for_each(umask, |ts| {
@@ -157,7 +161,7 @@ impl Board {
                         }
 
                         output.push(p.to_fen());
-                    },
+                    }
                     None => empty += 1,
                 }
             }

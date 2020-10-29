@@ -11,12 +11,12 @@ pub enum Castling {
 
 pub struct State {
     ep_target: Option<Square>, /* En-passant target square */
-    captured: Option<Piece>, /* Piece captured */
-    ad: [[u32; 64]; 2], /* A/D maps */
-    fm_number: u32, /* Move number */
-    hm_clock: u32, /* Halfmove clock */
-    castling: [[bool; 2]; 2], /* Castling rights */
-    last_move: Option<Move>, /* Last move */
+    captured: Option<Piece>,   /* Piece captured */
+    ad: [[u32; 64]; 2],        /* A/D maps */
+    fm_number: u32,            /* Move number */
+    hm_clock: u32,             /* Halfmove clock */
+    castling: [[bool; 2]; 2],  /* Castling rights */
+    last_move: Option<Move>,   /* Last move */
 }
 
 pub struct Position {
@@ -30,7 +30,10 @@ impl Position {
         let parts: Vec<&str> = fen.split(' ').collect();
 
         if parts.len() != 6 {
-            error!("Invalid number of FEN parts: expected 6, read {}", parts.len());
+            error!(
+                "Invalid number of FEN parts: expected 6, read {}",
+                parts.len()
+            );
             return None;
         }
 
@@ -38,7 +41,10 @@ impl Position {
         let ranks: Vec<&str> = parts[0].split('/').collect();
 
         if ranks.len() != 8 {
-            error!("Invalid number of FEN ranks: expected 8, read {}", ranks.len());
+            error!(
+                "Invalid number of FEN ranks: expected 8, read {}",
+                ranks.len()
+            );
             return None;
         }
 
@@ -64,7 +70,7 @@ impl Position {
                         None => {
                             error!("Invalid piece character '{}' in FEN", c);
                             return None;
-                        },
+                        }
                     }
 
                     f += 1;
@@ -124,7 +130,7 @@ impl Position {
         let fm_number = fm_number.unwrap();
 
         Some(Position {
-            ply: vec!(State {
+            ply: vec![State {
                 ep_target: ep_target,
                 captured: None,
                 ad: [[0; 64]; 2],
@@ -132,7 +138,7 @@ impl Position {
                 hm_clock: hm_clock,
                 castling: rights,
                 last_move: None,
-            }),
+            }],
             b: b,
             ctm: ctm,
         })
@@ -184,36 +190,66 @@ mod tests {
 
     #[test]
     fn position_parse_fen_works() {
-        Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap();
+        Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string())
+            .unwrap();
     }
 
     #[test]
     fn position_write_fen_works() {
-        assert_eq!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap().to_fen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        assert_eq!(
+            Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string())
+                .unwrap()
+                .to_fen(),
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        );
     }
 
     #[test]
     fn position_invalid_fen_works() {
         /* too many parts */
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 100".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 100".to_string()
+        )
+        .is_none());
 
         /* bad rank count */
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()
+        )
+        .is_none());
 
         /* bad rank content */
-        assert!(Position::new("rnbqkbnrQ/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnrQ/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()
+        )
+        .is_none());
 
         /* bad piece chars */
-        assert!(Position::new("rnbqkbnrv/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnrv/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()
+        )
+        .is_none());
 
         /* invalid color */
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR k KQkq - 0 1".to_string()).is_none());
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR sdfkjns KQkq - 0 1 100".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR k KQkq - 0 1".to_string()
+        )
+        .is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR sdfkjns KQkq - 0 1 100".to_string()
+        )
+        .is_none());
 
         /* bad hm clock */
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - abc 1".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - abc 1".to_string()
+        )
+        .is_none());
 
         /* bad fm number */
-        assert!(Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 abc".to_string()).is_none());
+        assert!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 abc".to_string()
+        )
+        .is_none());
     }
 }
