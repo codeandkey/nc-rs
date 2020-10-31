@@ -32,4 +32,11 @@ fn main() {
         "{}",
         bitboard::to_pretty(attacks::queen(Square::at(0, 0), 128237u64))
     );
+
+    let p = position::Position::new("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()).unwrap();
+    let m = p.gen_pseudolegal_moves();
+
+    for _m in m {
+        println!("Move: {}", _m.to_uci());
+    }
 }

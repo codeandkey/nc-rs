@@ -3,6 +3,8 @@ use crate::gmove::*;
 use crate::piece::*;
 use crate::square::*;
 use crate::zobrist::*;
+use crate::attacks;
+use crate::bitboard;
 
 pub enum Castling {
     QUEENSIDE = 0,
@@ -23,6 +25,38 @@ pub struct Position {
     ply: Vec<State>,
     b: Board,
     ctm: Color,
+}
+
+mod movegen {
+    /* pawns on these masks can promote */
+    pub const PAWN_PROMOTE_MASK: [u64; 2] = [
+        0x00ff000000000000,
+        0x000000000000ff00,
+    ];
+
+    /* pawns on these masks can jump */
+    pub const PAWN_JUMP_MASK: [u64; 2] = [
+        0x000000000000ff00,
+        0x00ff000000000000,
+    ];
+
+    /* pawn move direction */
+    pub const PAWN_DIRECTION: [i32; 2] = [
+        8,
+        -8
+    ];
+
+    /* pawn left captures */
+    pub const PAWN_LC_DIRECTION: [i32; 2] = [
+        7,
+        -9,
+    ];
+
+    /* pawn right captures */
+    pub const PAWN_RC_DIRECTION: [i32; 2] = [
+        9,
+        -7,
+    ];
 }
 
 impl Position {
@@ -182,6 +216,127 @@ impl Position {
 
         output
     }
+
+    pub fn gen_pseudolegal_moves(&self) -> Vec<Move> {
+        let mut output: Vec<Move> = Vec::new();
+
+        /* Gen for pawns with potential to promote */
+        let promoting_pawns = self.b.piece_occ(Type::PAWN) & self.b.color_occ(self.ctm) & movegen::PAWN_PROMOTE_MASK[self.ctm as usize];
+
+        /* Potential move masks */
+        let promoting_advances = bitboard::shift(promoting_pawns, movegen::PAWN_DIRECTION[self.ctm as usize]) & !self.b.global_occ();
+        let promoting_left_captures = bitboard::shift(promoting_pawns & !bitboard::FILES[0], movegen::PAWN_LC_DIRECTION[self.ctm as usize]) & self.b.color_occ(self.ctm.flip());
+        let promoting_right_captures = bitboard::shift(promoting_pawns & !bitboard::FILES[7], movegen::PAWN_RC_DIRECTION[self.ctm as usize]) & self.b.color_occ(self.ctm.flip());
+
+        /* Perform movegen */
+        bitboard::for_each(promoting_advances, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, Some(Type::QUEEN)));
+            output.push(Move::new(src, t, Some(Type::KNIGHT)));
+            output.push(Move::new(src, t, Some(Type::ROOK)));
+            output.push(Move::new(src, t, Some(Type::BISHOP)));
+        });
+
+        bitboard::for_each(promoting_left_captures, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_LC_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, Some(Type::QUEEN)));
+            output.push(Move::new(src, t, Some(Type::KNIGHT)));
+            output.push(Move::new(src, t, Some(Type::ROOK)));
+            output.push(Move::new(src, t, Some(Type::BISHOP)));
+        });
+
+        bitboard::for_each(promoting_right_captures, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_RC_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, Some(Type::QUEEN)));
+            output.push(Move::new(src, t, Some(Type::KNIGHT)));
+            output.push(Move::new(src, t, Some(Type::ROOK)));
+            output.push(Move::new(src, t, Some(Type::BISHOP)));
+        });
+
+        /* Gen for nonpromoting pawns */
+        let np_pawns = self.b.piece_occ(Type::PAWN) & self.b.color_occ(self.ctm) & !movegen::PAWN_PROMOTE_MASK[self.ctm as usize];
+
+        let ep_mask = match self.ply.last().unwrap().ep_target {
+            Some(s) => s.mask(),
+            None => 0u64,
+        };
+
+        let np_pawn_advances = bitboard::shift(np_pawns, movegen::PAWN_DIRECTION[self.ctm as usize]) & !self.b.global_occ();
+        let np_pawn_left_captures = bitboard::shift(np_pawns & !bitboard::FILES[0], movegen::PAWN_LC_DIRECTION[self.ctm as usize]) & (self.b.color_occ(self.ctm.flip()) | ep_mask);
+        let np_pawn_right_captures = bitboard::shift(np_pawns & !bitboard::FILES[7], movegen::PAWN_RC_DIRECTION[self.ctm as usize]) & (self.b.color_occ(self.ctm.flip()) | ep_mask);
+
+        /* Find jumps by advancing twice */
+        let np_pawn_jumps = bitboard::shift(np_pawns & movegen::PAWN_JUMP_MASK[self.ctm as usize], movegen::PAWN_DIRECTION[self.ctm as usize]) & !self.b.global_occ();
+        let np_pawn_jumps = bitboard::shift(np_pawn_jumps, movegen::PAWN_DIRECTION[self.ctm as usize]) & !self.b.global_occ();
+
+        /* Generate moves */
+        bitboard::for_each(np_pawn_advances, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, None));
+        });
+
+        bitboard::for_each(np_pawn_left_captures, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_LC_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, None));
+        });
+
+        bitboard::for_each(np_pawn_right_captures, |t| {
+            let src = Square::from_index((t.index() as i32 - movegen::PAWN_RC_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, None));
+        });
+
+        bitboard::for_each(np_pawn_jumps, |t| {
+            let src = Square::from_index((t.index() as i32 - 2 * movegen::PAWN_DIRECTION[self.ctm as usize]) as usize).unwrap();
+            output.push(Move::new(src, t, None));
+        });
+
+        /* Generate queen moves */
+        bitboard::for_each(self.b.piece_occ(Type::QUEEN) & self.b.color_occ(self.ctm), |s| {
+            let att = attacks::queen(s, self.b.global_occ()) & !self.b.color_occ(self.ctm);
+
+            bitboard::for_each(att, |t| {
+                output.push(Move::new(s, t, None));
+            });
+        });
+
+        /* Generate rook moves */
+        bitboard::for_each(self.b.piece_occ(Type::ROOK) & self.b.color_occ(self.ctm), |s| {
+            let att = attacks::rook(s, self.b.global_occ()) & !self.b.color_occ(self.ctm);
+
+            bitboard::for_each(att, |t| {
+                output.push(Move::new(s, t, None));
+            });
+        });
+
+        /* Generate bishop moves */
+        bitboard::for_each(self.b.piece_occ(Type::BISHOP) & self.b.color_occ(self.ctm), |s| {
+            let att = attacks::bishop(s, self.b.global_occ()) & !self.b.color_occ(self.ctm);
+
+            bitboard::for_each(att, |t| {
+                output.push(Move::new(s, t, None));
+            });
+        });
+
+        /* Generate knight moves */
+        bitboard::for_each(self.b.piece_occ(Type::KNIGHT) & self.b.color_occ(self.ctm), |s| {
+            let att = attacks::knight(s) & !self.b.color_occ(self.ctm);
+
+            bitboard::for_each(att, |t| {
+                output.push(Move::new(s, t, None));
+            });
+        });
+
+        /* Generate king moves */
+        bitboard::for_each(self.b.piece_occ(Type::KING) & self.b.color_occ(self.ctm), |s| {
+            let att = attacks::king(s) & !self.b.color_occ(self.ctm);
+
+            bitboard::for_each(att, |t| {
+                output.push(Move::new(s, t, None));
+            });
+        });
+
+        output
+    }
 }
 
 #[cfg(test)]
@@ -251,5 +406,12 @@ mod tests {
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 abc".to_string()
         )
         .is_none());
+    }
+
+    #[test]
+    fn position_pseudolegal_gen_standard_count() {
+        assert_eq!(Position::new(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".to_string()
+        ).unwrap().gen_pseudolegal_moves().len(), 20);
     }
 }
