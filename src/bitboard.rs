@@ -1,5 +1,27 @@
 use crate::square::*;
 
+pub const RANKS: [u64; 8] = [
+    0x00000000000000FF,
+    0x00000000000000FF << 8,
+    0x00000000000000FF << 16,
+    0x00000000000000FF << 24,
+    0x00000000000000FF << 32,
+    0x00000000000000FF << 40,
+    0x00000000000000FF << 48,
+    0x00000000000000FF << 56,
+];
+
+pub const FILES: [u64; 8] = [
+    0x0101010101010101,
+    0x0101010101010101 << 1,
+    0x0101010101010101 << 2,
+    0x0101010101010101 << 3,
+    0x0101010101010101 << 4,
+    0x0101010101010101 << 5,
+    0x0101010101010101 << 6,
+    0x0101010101010101 << 7,
+];
+
 pub fn to_pretty(b: u64) -> String {
     let mut output: String = String::new();
 
@@ -28,6 +50,14 @@ where
         let s: Square = Square::from_index(b.trailing_zeros() as usize).unwrap();
         b ^= s.mask();
         c(s);
+    }
+}
+
+pub fn shift(b: u64, d: i32) -> u64 {
+    if (d) > 0 {
+        b << d
+    } else {
+        b >> d
     }
 }
 
