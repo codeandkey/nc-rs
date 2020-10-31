@@ -43,6 +43,13 @@ pub enum Color {
 }
 
 impl Color {
+    pub fn flip(&self) -> Color {
+        match self {
+            Color::WHITE => Color::BLACK,
+            Color::BLACK => Color::WHITE,
+        }
+    }
+
     pub fn to_fen(&self) -> char {
         match self {
             Color::WHITE => 'w',
