@@ -142,6 +142,14 @@ impl Board {
         self.piece[t as usize]
     }
 
+    pub fn color_occ(&self, c: Color) -> u64 {
+        self.color[c as usize]
+    }
+
+    pub fn global_occ(&self) -> u64 {
+        self.occ
+    }
+
     pub fn get_ad(&self) -> [[u64; 64]; 2] {
         self.ad
     }
