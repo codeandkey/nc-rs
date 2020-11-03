@@ -4,6 +4,7 @@ use crate::piece::*;
 use crate::square::*;
 use crate::zobrist;
 
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Board {
     state: [Option<Piece>; 64],
     zkey: u64,
