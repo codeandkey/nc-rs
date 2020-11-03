@@ -9,7 +9,7 @@ pub enum Direction {
     SOUTHEAST = -7,
 }
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub struct Square {
     ind: usize,
     r: usize,
