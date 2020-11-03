@@ -630,29 +630,13 @@ impl Position {
         let mut total: usize = 0;
         let moves = self.gen_pseudolegal_moves();
 
-        let pr = match self.ply.last().unwrap().last_move {
-            Some(m) => m.to_uci() == "b2b3".to_string(),
-            None => false,
-        };
-
         for m in moves {
-            if p == 0 {
-                println!("making 0-ply move {}", m.to_uci());
-            }
-
             if self.make_move(m.clone()) {
                 let rs = self.perft(d - 1, p + 1);
-                if pr {
-                    println!("{}: {}", m.to_uci(), rs);
-                }
                 total += rs;
             }
 
             self.unmake_move(m);
-        }
-
-        if pr {
-            println!("total: {}", total);
         }
 
         total
