@@ -55,9 +55,9 @@ where
 
 pub fn shift(b: u64, d: i32) -> u64 {
     if (d) > 0 {
-        b << d
+        b.overflowing_shl(d as u32).0
     } else {
-        b >> d
+        b.overflowing_shr((-d) as u32).0
     }
 }
 
